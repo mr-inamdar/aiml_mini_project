@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideWise — Bike Rental Demand Forecasting</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="app-header">
+        <div class="container header-container">
+            <div class="brand">
+                <span class="brand-icon">🚲</span>
+                <h1>RideWise</h1>
+            </div>
+            <p class="tagline">Urban Bike Rental Demand Forecasting using Machine Learning</p>
+            <div id="system-status-badge" class="badge">Checking System...</div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <section class="intro-card card">
+            <h2>About the Project</h2>
+            <p>
+                RideWise is a college machine learning mini-project that predicts hourly bike rental demand 
+                in metropolitan areas using meteorological conditions, calendar schedules, and diurnal patterns 
+                trained on the authentic UCI Bike Sharing Dataset.
+            </p>
+        </section>
+
+        <!-- Prediction Form Card -->
+        <section class="prediction-section card">
+            <h2>Forecast Rental Demand</h2>
+            <p class="section-desc">Select environmental and temporal features to predict hourly rental volume.</p>
+            
+            <form id="prediction-form" class="prediction-grid">
+                <div class="form-group">
+                    <label for="season">Season:</label>
+                    <select id="season" name="season" required>
+                        <option value="1">Spring</option>
+                        <option value="2">Summer</option>
+                        <option value="3" selected>Fall</option>
+                        <option value="4">Winter</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mnth">Month:</label>
+                    <select id="mnth" name="mnth" required>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7" selected>July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="hr">Hour of Day (0–23):</label>
+                    <input type="number" id="hr" name="hr" min="0" max="23" value="17" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="weekday">Day of Week:</label>
+                    <select id="weekday" name="weekday" required>
+                        <option value="0">Sunday</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3" selected>Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="workingday">Working Day:</label>
+                    <select id="workingday" name="workingday" required>
+                        <option value="1" selected>Yes (Mon–Fri Non-Holiday)</option>
+                        <option value="0">No (Weekend or Holiday)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="holiday">Holiday:</label>
+                    <select id="holiday" name="holiday" required>
+                        <option value="0" selected>No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="weathersit">Weather Situation:</label>
+                    <select id="weathersit" name="weathersit" required>
+                        <option value="1" selected>Clear / Few Clouds</option>
+                        <option value="2">Mist / Cloudy</option>
+                        <option value="3">Light Snow / Light Rain</option>
+                        <option value="4">Heavy Rain / Thunderstorm / Snow</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="temp">Temperature (Normalized 0.0 – 1.0):</label>
+                    <input type="number" id="temp" name="temp" min="0" max="1" step="0.01" value="0.70" required>
+                    <small>e.g. 0.70 &approx; 28.7&deg;C</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="hum">Relative Humidity (Normalized 0.0 – 1.0):</label>
+                    <input type="number" id="hum" name="hum" min="0" max="1" step="0.01" value="0.50" required>
+                    <small>e.g. 0.50 = 50%</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="windspeed">Wind Speed (Normalized 0.0 – 1.0):</label>
+                    <input type="number" id="windspeed" name="windspeed" min="0" max="1" step="0.01" value="0.20" required>
+                    <small>e.g. 0.20 &approx; 13.4 km/h</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="predict-btn" class="btn btn-primary">Generate Prediction</button>
+                </div>
+            </form>
+
+            <div id="prediction-result" class="result-box" style="display: none;">
+                <h3>Predicted Demand:</h3>
+                <div class="demand-value"><span id="prediction-count">0</span> <span class="unit">bikes/hour</span></div>
+            </div>
+        </section>
+
+        <!-- Benchmark Metrics Card -->
+        <section class="metrics-section card">
+            <h2>Model Performance (Held-Out Evaluation)</h2>
+            <div id="metrics-table-container">Loading model metrics...</div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="container">
+            <p>RideWise &mdash; College AIML Mini Project | Built with Flask &amp; Scikit-Learn</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

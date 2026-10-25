@@ -123,10 +123,64 @@ pip install -r requirements.txt
 python model/train_model.py
 ```
 
-### 5. Verify Dataset, Models, and Inference
-Run the full test suite (11 unit tests):
+### 5. Start the Flask Backend Server
+```powershell
+python app.py
+```
+The server will start on `http://127.0.0.1:5000`.
+
+### 6. Run the Automated Test Suite (21 Tests)
+Run all schema, model pipeline, and Flask API tests:
 ```powershell
 pytest tests/ -v
+```
+
+---
+
+## 📡 REST API Documentation
+
+| Method | Endpoint | Description | Sample Output / Payload |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/` | Web dashboard | HTML5 Web Interface |
+| **GET** | `/api/health` | Service and model availability status | `{"status": "healthy", "model_loaded": true}` |
+| **GET** | `/api/metrics` | Held-out benchmark metrics for all models | `{"best_model": {"name": "Random Forest", ...}}` |
+| **GET** | `/api/analytics` | Statistical summaries from authentic dataset | `{"summary": {...}, "hourly_trends": [...]}` |
+| **POST** | `/api/predict` | Real-time demand inference | `{"predicted_demand": 712, "status": "success"}` |
+
+### Sample Prediction Request (PowerShell)
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:5000/api/predict" `
+  -ContentType "application/json" `
+  -Body '{
+    "season": 3,
+    "mnth": 7,
+    "hr": 17,
+    "holiday": 0,
+    "weekday": 3,
+    "workingday": 1,
+    "weathersit": 1,
+    "temp": 0.72,
+    "hum": 0.50,
+    "windspeed": 0.20
+  }'
+```
+
+### Sample Prediction Request (cURL)
+```bash
+curl -X POST http://127.0.0.1:5000/api/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "season": 3,
+    "mnth": 7,
+    "hr": 17,
+    "holiday": 0,
+    "weekday": 3,
+    "workingday": 1,
+    "weathersit": 1,
+    "temp": 0.72,
+    "hum": 0.50,
+    "windspeed": 0.20
+  }'
 ```
 
 ---
@@ -167,14 +221,14 @@ Trained on first 80% (13,903 records) and evaluated on remaining 20% (3,476 reco
   - Exported `metrics.json`, `feature_schema.json`, `feature_importance.json`
   - Reusable inference helper created in `model/predict.py`
   - Retraining entrypoint created in `model/retrain.py`
-  - 11 automated unit tests in `pytest` passing
-- [ ] **Phase 3: Flask Backend Development**
-  - Flask web server initialization (`app.py`)
-  - REST endpoints (`/` and `/predict`)
-  - Integration with `model/predict.py`
+- [x] **Phase 3: Flask Backend Development**
+  - Flask web server implementation (`app.py`)
+  - Endpoints created: `GET /`, `GET /api/health`, `GET /api/metrics`, `GET /api/analytics`, `POST /api/predict`
+  - Strict input validation rejecting NaN, Inf, out-of-bounds numbers, invalid categories
+  - Model caching (no retraining per request)
+  - Full automated API test suite in `tests/test_api.py` (21 total tests passing)
 - [ ] **Phase 4: Frontend Development & Visualizations**
-  - HTML5 form with sleek modern UI
-  - Real-time client-side inputs and Chart.js 24-hour demand curve
+  - Modern, responsive HTML5/CSS3 interface
+  - Interactive Chart.js visualizations (hourly commute curve, weekly distribution)
 - [ ] **Phase 5: End-to-End Testing & Project Documentation**
-  - API endpoint integration tests
   - Project report and viva preparation guide
