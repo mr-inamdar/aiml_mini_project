@@ -1,0 +1,12 @@
+# RideWise Dependencies
+# Core ML & Data Processing
+numpy>=1.26.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Web Backend
+Flask>=3.0.0
+
+# Testing
+pytest>=8.0.0
