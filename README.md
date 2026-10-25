@@ -118,11 +118,35 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 4. Verify Dataset & Environment
-Run the test suite to ensure the dataset and schema are fully validated:
+### 4. Run Model Training & Benchmarking
+```powershell
+python model/train_model.py
+```
+
+### 5. Verify Dataset, Models, and Inference
+Run the full test suite (11 unit tests):
 ```powershell
 pytest tests/ -v
 ```
+
+---
+
+## 📈 Model Benchmark Results (Held-Out Chronological Split)
+
+Trained on first 80% (13,903 records) and evaluated on remaining 20% (3,476 records):
+
+| Model Algorithm | MAE (Rentals) | RMSE (Rentals) | R² Score | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Linear Regression** | 110.30 | 158.50 | 0.4832 | Baseline |
+| **Decision Tree Regressor** | 95.90 | 140.79 | 0.5923 | Non-linear tree |
+| **Random Forest Regressor** | **86.58** | **124.30** | **0.6822** | **Selected Best Model** |
+
+### Top Predictive Feature Drivers:
+1. **Hour of Day (`hr`):** 46.18% cumulative importance (peak hours at 8:00 AM & 5:00–6:00 PM)
+2. **Temperature (`temp`):** 19.74% importance
+3. **Humidity (`hum`):** 15.85% importance
+4. **Working Day (`workingday`):** 8.85% importance
+5. **Month & Season (`mnth`, `season`):** 3.59% combined importance
 
 ---
 
@@ -133,18 +157,24 @@ pytest tests/ -v
   - `dataset/hour.csv` verified (17,379 rows, 17 columns, zero missing values)
   - Data dictionary documented in `docs/`
   - Automated integrity tests implemented with `pytest`
-- [ ] **Phase 2: Exploratory Data Analysis (EDA) & Model Training**
-  - Feature engineering (cyclical encoding for hour/month, leakage prevention)
-  - Model benchmarking (Linear Regression, Ridge, Random Forest, Gradient Boosting)
-  - Model evaluation (MAE, RMSE, R² score)
-  - Model persistence via `joblib` into `model/`
+- [x] **Phase 2: Data Preprocessing & Model Training**
+  - Target leakage prevention (`casual`, `registered`, `instant`, `dteday` excluded)
+  - Chronological 80/20 train-test split implemented
+  - Feature encoding via scikit-learn `ColumnTransformer` inside unified `Pipeline`
+  - Benchmarked Linear Regression, Decision Tree, and Random Forest
+  - Selected Random Forest (R² = 0.6822, MAE = 86.58, RMSE = 124.30)
+  - Serialized pipeline to `model/bike_model.joblib`
+  - Exported `metrics.json`, `feature_schema.json`, `feature_importance.json`
+  - Reusable inference helper created in `model/predict.py`
+  - Retraining entrypoint created in `model/retrain.py`
+  - 11 automated unit tests in `pytest` passing
 - [ ] **Phase 3: Flask Backend Development**
   - Flask web server initialization (`app.py`)
-  - Prediction REST endpoint accepting user input
-  - Model loading and preprocessing pipeline
+  - REST endpoints (`/` and `/predict`)
+  - Integration with `model/predict.py`
 - [ ] **Phase 4: Frontend Development & Visualizations**
-  - User-friendly web form with real-time validation
-  - Chart.js demand visualization
+  - HTML5 form with sleek modern UI
+  - Real-time client-side inputs and Chart.js 24-hour demand curve
 - [ ] **Phase 5: End-to-End Testing & Project Documentation**
-  - Integration tests for endpoints
-  - Mini project viva / report preparation guide
+  - API endpoint integration tests
+  - Project report and viva preparation guide

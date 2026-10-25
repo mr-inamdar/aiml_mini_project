@@ -1,0 +1,128 @@
+{
+  "features": [
+    "season",
+    "mnth",
+    "hr",
+    "weekday",
+    "weathersit",
+    "temp",
+    "hum",
+    "windspeed",
+    "holiday",
+    "workingday"
+  ],
+  "target": "cnt",
+  "feature_groups": {
+    "categorical": [
+      "season",
+      "mnth",
+      "hr",
+      "weekday",
+      "weathersit"
+    ],
+    "numeric": [
+      "temp",
+      "hum",
+      "windspeed"
+    ],
+    "binary": [
+      "holiday",
+      "workingday"
+    ]
+  },
+  "descriptions": {
+    "season": {
+      "type": "categorical",
+      "mapping": {
+        "1": "Spring",
+        "2": "Summer",
+        "3": "Fall",
+        "4": "Winter"
+      }
+    },
+    "mnth": {
+      "type": "categorical",
+      "mapping": {
+        "1": "January",
+        "2": "February",
+        "3": "March",
+        "4": "April",
+        "5": "May",
+        "6": "June",
+        "7": "July",
+        "8": "August",
+        "9": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December"
+      }
+    },
+    "hr": {
+      "type": "categorical",
+      "range": [
+        0,
+        23
+      ],
+      "description": "Hour of the day (0 to 23)"
+    },
+    "weekday": {
+      "type": "categorical",
+      "mapping": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
+    },
+    "holiday": {
+      "type": "binary",
+      "mapping": {
+        "0": "No",
+        "1": "Yes"
+      }
+    },
+    "workingday": {
+      "type": "binary",
+      "mapping": {
+        "0": "Weekend or Holiday",
+        "1": "Working Day"
+      }
+    },
+    "weathersit": {
+      "type": "categorical",
+      "mapping": {
+        "1": "Clear / Few Clouds",
+        "2": "Mist / Cloudy",
+        "3": "Light Rain / Snow",
+        "4": "Heavy Rain / Storm / Snow"
+      }
+    },
+    "temp": {
+      "type": "numeric",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "unit": "Normalized Celsius (real_celsius = temp * 41)"
+    },
+    "hum": {
+      "type": "numeric",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "unit": "Normalized Humidity (real_percent = hum * 100)"
+    },
+    "windspeed": {
+      "type": "numeric",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "unit": "Normalized Wind Speed (real_kmh = windspeed * 67)"
+    }
+  }
+}
