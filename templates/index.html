@@ -4,22 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RideWise — Bike Rental Demand Forecasting</title>
+    <meta name="description" content="College AIML mini project to predict hourly bike rental demand using machine learning on the UCI Bike Sharing dataset.">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <!-- Header -->
     <header class="app-header">
         <div class="container header-container">
             <div class="brand">
-                <span class="brand-icon">🚲</span>
-                <h1>RideWise</h1>
+                <span class="brand-icon">&#128690;</span>
+                <div>
+                    <h1>RideWise</h1>
+                    <p class="tagline">Hourly Bike Rental Demand Forecasting using Machine Learning</p>
+                </div>
             </div>
-            <p class="tagline">Urban Bike Rental Demand Forecasting using Machine Learning</p>
-            <div id="system-status-badge" class="badge">Checking System...</div>
+            <div id="system-status-badge" class="badge badge-loading">Checking System...</div>
         </div>
     </header>
 
+    <!-- Main Container -->
     <main class="container main-content">
-        <section class="intro-card card">
+        <!-- Project Introduction -->
+        <section class="card intro-card">
             <h2>About the Project</h2>
             <p>
                 RideWise is a college machine learning mini-project that predicts hourly bike rental demand 
@@ -29,122 +35,163 @@
         </section>
 
         <!-- Prediction Form Card -->
-        <section class="prediction-section card">
+        <section class="card prediction-card">
             <h2>Forecast Rental Demand</h2>
-            <p class="section-desc">Select environmental and temporal features to predict hourly rental volume.</p>
+            <p class="section-desc">Enter the temporal and meteorological parameters below to estimate hourly bike rental volume.</p>
             
-            <form id="prediction-form" class="prediction-grid">
-                <div class="form-group">
-                    <label for="season">Season:</label>
-                    <select id="season" name="season" required>
-                        <option value="1">Spring</option>
-                        <option value="2">Summer</option>
-                        <option value="3" selected>Fall</option>
-                        <option value="4">Winter</option>
-                    </select>
+            <form id="prediction-form" class="prediction-form" novalidate>
+                <div class="form-grid">
+                    <!-- Season -->
+                    <div class="form-group">
+                        <label for="season">Season:</label>
+                        <select id="season" name="season" required>
+                            <option value="1">1 - Spring</option>
+                            <option value="2">2 - Summer</option>
+                            <option value="3" selected>3 - Fall</option>
+                            <option value="4">4 - Winter</option>
+                        </select>
+                    </div>
+
+                    <!-- Month -->
+                    <div class="form-group">
+                        <label for="mnth">Month:</label>
+                        <select id="mnth" name="mnth" required>
+                            <option value="1">1 - January</option>
+                            <option value="2">2 - February</option>
+                            <option value="3">3 - March</option>
+                            <option value="4">4 - April</option>
+                            <option value="5">5 - May</option>
+                            <option value="6">6 - June</option>
+                            <option value="7" selected>7 - July</option>
+                            <option value="8">8 - August</option>
+                            <option value="9">9 - September</option>
+                            <option value="10">10 - October</option>
+                            <option value="11">11 - November</option>
+                            <option value="12">12 - December</option>
+                        </select>
+                    </div>
+
+                    <!-- Hour of Day -->
+                    <div class="form-group">
+                        <label for="hr">Hour of Day (0–23):</label>
+                        <input type="number" id="hr" name="hr" min="0" max="23" value="17" required>
+                    </div>
+
+                    <!-- Day of Week -->
+                    <div class="form-group">
+                        <label for="weekday">Day of Week:</label>
+                        <select id="weekday" name="weekday" required>
+                            <option value="0">0 - Sunday</option>
+                            <option value="1">1 - Monday</option>
+                            <option value="2">2 - Tuesday</option>
+                            <option value="3" selected>3 - Wednesday</option>
+                            <option value="4">4 - Thursday</option>
+                            <option value="5">5 - Friday</option>
+                            <option value="6">6 - Saturday</option>
+                        </select>
+                    </div>
+
+                    <!-- Working Day -->
+                    <div class="form-group">
+                        <label for="workingday">Working Day:</label>
+                        <select id="workingday" name="workingday" required>
+                            <option value="1" selected>1 - Yes (Mon–Fri Non-Holiday)</option>
+                            <option value="0">0 - No (Weekend or Holiday)</option>
+                        </select>
+                    </div>
+
+                    <!-- Holiday -->
+                    <div class="form-group">
+                        <label for="holiday">Holiday:</label>
+                        <select id="holiday" name="holiday" required>
+                            <option value="0" selected>0 - No</option>
+                            <option value="1">1 - Yes</option>
+                        </select>
+                    </div>
+
+                    <!-- Weather Situation -->
+                    <div class="form-group full-width">
+                        <label for="weathersit">Weather Condition:</label>
+                        <select id="weathersit" name="weathersit" required>
+                            <option value="1" selected>1 - Clear / Few Clouds / Partly Cloudy</option>
+                            <option value="2">2 - Mist / Cloudy / Broken Clouds</option>
+                            <option value="3">3 - Light Snow / Light Rain / Thunderstorm</option>
+                            <option value="4">4 - Heavy Rain / Ice Pellets / Snow / Fog</option>
+                        </select>
+                    </div>
+
+                    <!-- Temperature -->
+                    <div class="form-group">
+                        <label for="temp">Temperature (Normalized 0.0 – 1.0):</label>
+                        <input type="number" id="temp" name="temp" min="0" max="1" step="0.01" value="0.70" required>
+                        <small class="helper-text">Formula: temp = &deg;C / 41 (e.g., 0.70 &approx; 28.7&deg;C)</small>
+                    </div>
+
+                    <!-- Relative Humidity -->
+                    <div class="form-group">
+                        <label for="hum">Relative Humidity (Normalized 0.0 – 1.0):</label>
+                        <input type="number" id="hum" name="hum" min="0" max="1" step="0.01" value="0.50" required>
+                        <small class="helper-text">Formula: hum = % / 100 (e.g., 0.50 = 50%)</small>
+                    </div>
+
+                    <!-- Wind Speed -->
+                    <div class="form-group">
+                        <label for="windspeed">Wind Speed (Normalized 0.0 – 1.0):</label>
+                        <input type="number" id="windspeed" name="windspeed" min="0" max="1" step="0.01" value="0.20" required>
+                        <small class="helper-text">Formula: windspeed = km/h / 67 (e.g., 0.20 &approx; 13.4 km/h)</small>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="mnth">Month:</label>
-                    <select id="mnth" name="mnth" required>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7" selected>July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="hr">Hour of Day (0–23):</label>
-                    <input type="number" id="hr" name="hr" min="0" max="23" value="17" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="weekday">Day of Week:</label>
-                    <select id="weekday" name="weekday" required>
-                        <option value="0">Sunday</option>
-                        <option value="1">Monday</option>
-                        <option value="2">Tuesday</option>
-                        <option value="3" selected>Wednesday</option>
-                        <option value="4">Thursday</option>
-                        <option value="5">Friday</option>
-                        <option value="6">Saturday</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="workingday">Working Day:</label>
-                    <select id="workingday" name="workingday" required>
-                        <option value="1" selected>Yes (Mon–Fri Non-Holiday)</option>
-                        <option value="0">No (Weekend or Holiday)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="holiday">Holiday:</label>
-                    <select id="holiday" name="holiday" required>
-                        <option value="0" selected>No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="weathersit">Weather Situation:</label>
-                    <select id="weathersit" name="weathersit" required>
-                        <option value="1" selected>Clear / Few Clouds</option>
-                        <option value="2">Mist / Cloudy</option>
-                        <option value="3">Light Snow / Light Rain</option>
-                        <option value="4">Heavy Rain / Thunderstorm / Snow</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="temp">Temperature (Normalized 0.0 – 1.0):</label>
-                    <input type="number" id="temp" name="temp" min="0" max="1" step="0.01" value="0.70" required>
-                    <small>e.g. 0.70 &approx; 28.7&deg;C</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="hum">Relative Humidity (Normalized 0.0 – 1.0):</label>
-                    <input type="number" id="hum" name="hum" min="0" max="1" step="0.01" value="0.50" required>
-                    <small>e.g. 0.50 = 50%</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="windspeed">Wind Speed (Normalized 0.0 – 1.0):</label>
-                    <input type="number" id="windspeed" name="windspeed" min="0" max="1" step="0.01" value="0.20" required>
-                    <small>e.g. 0.20 &approx; 13.4 km/h</small>
-                </div>
-
+                <!-- Form Controls -->
                 <div class="form-actions">
-                    <button type="submit" id="predict-btn" class="btn btn-primary">Generate Prediction</button>
+                    <button type="submit" id="predict-btn" class="btn btn-primary">Predict Demand</button>
+                    <button type="button" id="reset-btn" class="btn btn-secondary">Reset</button>
                 </div>
             </form>
 
+            <!-- Loading State -->
+            <div id="loading-indicator" class="loading-box" style="display: none;">
+                <span class="spinner"></span>
+                <span>Calculating prediction using trained Random Forest model...</span>
+            </div>
+
+            <!-- Error Message Box -->
+            <div id="error-box" class="error-box" style="display: none;">
+                <strong>Error:</strong> <span id="error-message"></span>
+            </div>
+
+            <!-- Prediction Result Box -->
             <div id="prediction-result" class="result-box" style="display: none;">
-                <h3>Predicted Demand:</h3>
-                <div class="demand-value"><span id="prediction-count">0</span> <span class="unit">bikes/hour</span></div>
+                <h3 class="result-title">Estimated Hourly Rental Demand</h3>
+                <div class="demand-value">
+                    <span id="prediction-count">0</span>
+                    <span class="demand-unit">bikes / hour</span>
+                </div>
+                <p class="result-note">
+                    <strong>Note:</strong> This value is a statistical estimate produced by the trained Random Forest model based on historical patterns, not a guaranteed count.
+                </p>
+                <div class="result-details">
+                    <span>Target: <code>cnt</code> (total rentals)</span> &bull; 
+                    <span>Model: <strong>Random Forest Regressor</strong></span> &bull; 
+                    <span>Raw Output: <code id="raw-prediction-val">0.00</code></span>
+                </div>
             </div>
         </section>
 
         <!-- Benchmark Metrics Card -->
-        <section class="metrics-section card">
+        <section class="card metrics-card">
             <h2>Model Performance (Held-Out Evaluation)</h2>
-            <div id="metrics-table-container">Loading model metrics...</div>
+            <p class="section-desc">Evaluated on the 20% held-out chronological test split (3,476 test hours) without data leakage.</p>
+            <div id="metrics-table-container">
+                <p class="text-muted">Loading model metrics from backend...</p>
+            </div>
         </section>
     </main>
 
+    <!-- Footer -->
     <footer class="app-footer">
         <div class="container">
-            <p>RideWise &mdash; College AIML Mini Project | Built with Flask &amp; Scikit-Learn</p>
+            <p>RideWise &mdash; College AIML Mini Project | Built with Python Flask &amp; Scikit-Learn</p>
         </div>
     </footer>
 

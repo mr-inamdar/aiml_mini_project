@@ -44,10 +44,12 @@ DATASET_PATH = os.path.join(BASE_DIR, "dataset", "hour.csv")
 MODEL_PATH = os.path.join(BASE_DIR, "model", "bike_model.joblib")
 METRICS_PATH = os.path.join(BASE_DIR, "model", "metrics.json")
 SCHEMA_PATH = os.path.join(BASE_DIR, "model", "feature_schema.json")
+IMPORTANCE_PATH = os.path.join(BASE_DIR, "model", "feature_importance.json")
 
-# In-memory cached analytics and schema
+# In-memory cached analytics, schema, and actual vs predicted evaluation slice
 _CACHED_ANALYTICS: Optional[Dict[str, Any]] = None
 _FEATURE_SCHEMA: Optional[Dict[str, Any]] = None
+_CACHED_ACTUAL_PRED: Optional[List[Dict[str, Any]]] = None
 
 
 def get_feature_schema() -> Dict[str, Any]:
@@ -255,6 +257,49 @@ def health_check():
     return jsonify(response), 200
 
 
+def get_actual_vs_predicted_sample() -> List[Dict[str, Any]]:
+    """Generate and cache an authentic test-set evaluation sample of actual vs predicted demand."""
+    global _CACHED_ACTUAL_PRED
+    if _CACHED_ACTUAL_PRED is not None:
+        return _CACHED_ACTUAL_PRED
+
+    if not os.path.exists(DATASET_PATH) or not os.path.exists(MODEL_PATH):
+        return []
+
+    try:
+        df = pd.read_csv(DATASET_PATH)
+        # Test split corresponds chronologically to the final 20%
+        test_start_idx = int(len(df) * 0.8)
+        test_df = df.iloc[test_start_idx:].copy()
+
+        # Extract a continuous 72-hour slice (3 calendar days) representing varied conditions
+        sample_slice = test_df.iloc[100:172]
+        result = predict_demand(sample_slice)
+        preds = result["predictions"]
+
+        day_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        records = []
+        for i, (_, row) in enumerate(sample_slice.iterrows()):
+            hr = int(row["hr"])
+            dteday = str(row["dteday"])
+            wkday = day_names[int(row["weekday"])]
+            records.append({
+                "time_label": f"{dteday} {hr:02d}:00",
+                "short_label": f"{wkday} {hr:02d}h",
+                "actual": int(row["cnt"]),
+                "predicted": int(preds[i]),
+                "workingday": int(row["workingday"]),
+                "temp_c": round(float(row["temp"]) * 41, 1),
+                "weather": int(row["weathersit"])
+            })
+
+        _CACHED_ACTUAL_PRED = records
+        return _CACHED_ACTUAL_PRED
+    except Exception as e:
+        logger.warning("Could not compute actual vs predicted evaluation sample: %s", e)
+        return []
+
+
 @app.route("/api/metrics", methods=["GET"])
 def get_metrics():
     """Return held-out model evaluation metrics from metrics.json."""
@@ -268,6 +313,17 @@ def get_metrics():
     try:
         with open(METRICS_PATH, "r", encoding="utf-8") as f:
             metrics_data = json.load(f)
+
+        # Include real feature importance from model artifacts if present
+        if os.path.exists(IMPORTANCE_PATH):
+            with open(IMPORTANCE_PATH, "r", encoding="utf-8") as f:
+                metrics_data["feature_importance"] = json.load(f)
+
+        # Include real actual-vs-predicted test evaluation sample
+        actual_pred = get_actual_vs_predicted_sample()
+        if actual_pred:
+            metrics_data["actual_vs_predicted"] = actual_pred
+
         return jsonify(metrics_data), 200
     except Exception as e:
         logger.exception("Failed to read metrics file: %s", e)
