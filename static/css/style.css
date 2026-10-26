@@ -273,10 +273,14 @@ body {
 /* Result Box */
 .result-box {
     margin-top: 1.5rem;
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem;
     background-color: var(--success-bg);
     border: 1px solid var(--success-border);
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
 }
 
@@ -294,37 +298,17 @@ body {
     font-weight: 800;
     color: var(--success-text);
     line-height: 1.1;
-    margin: 0.5rem 0;
+    margin: 0.25rem 0 0 0;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.35rem;
 }
 
 .demand-unit {
     font-size: 1rem;
     font-weight: 600;
     color: #15803d;
-    margin-left: 0.25rem;
-}
-
-.result-note {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    max-width: 650px;
-    margin: 0.75rem auto 0 auto;
-    line-height: 1.45;
-}
-
-.result-details {
-    margin-top: 0.85rem;
-    padding-top: 0.75rem;
-    border-top: 1px dashed #86efac;
-    font-size: 0.8rem;
-    color: #166534;
-}
-
-.result-details code {
-    background-color: rgba(255, 255, 255, 0.7);
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
 }
 
 /* Footer */

@@ -110,8 +110,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (response.ok && data.status === "success") {
                 predictionCount.textContent = data.predicted_demand.toLocaleString();
-                rawPredictionVal.textContent = Number(data.raw_prediction).toFixed(2);
-                resultBox.style.display = "block";
+                if (rawPredictionVal) {
+                    rawPredictionVal.textContent = Number(data.raw_prediction).toFixed(2);
+                }
+                resultBox.style.display = "flex";
             } else {
                 errorMessage.textContent = data.message || "Failed to generate prediction.";
                 errorBox.style.display = "block";
