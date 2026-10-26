@@ -41,7 +41,9 @@ def test_metrics_json_structure_and_values():
         assert "mae" in candidates[model_name]
         assert "rmse" in candidates[model_name]
         assert "r2" in candidates[model_name]
+        assert "prediction_score_pct" in candidates[model_name]
         assert candidates[model_name]["r2"] > 0, f"R2 score should be positive for {model_name}"
+        assert 0 <= candidates[model_name]["prediction_score_pct"] <= 100
 
     best_model = metrics_data["best_model"]
     assert best_model["name"] == "Random Forest"

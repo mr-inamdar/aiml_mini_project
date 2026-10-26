@@ -144,3 +144,38 @@ def test_api_404_handler(client):
     assert response.status_code == 404
     data = response.get_json()
     assert data["status"] == "error"
+
+
+def test_predict_invalid_data_types(client, valid_sample_payload):
+    """Verify string or boolean for numeric feature returns 400 Bad Request."""
+    valid_sample_payload["hr"] = "not_an_hour"
+    response = client.post(
+        "/api/predict",
+        data=json.dumps(valid_sample_payload),
+        content_type="application/json"
+    )
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data["status"] == "error"
+    assert "must be an integer" in data["message"]
+
+
+def test_predict_method_not_allowed(client):
+    """Verify GET on /api/predict returns 405 Method Not Allowed."""
+    response = client.get("/api/predict")
+    assert response.status_code == 405
+    data = response.get_json()
+    assert data["status"] == "error"
+    assert "Method GET not allowed" in data["message"]
+
+
+def test_metrics_includes_prediction_score(client):
+    """Verify GET /api/metrics returns defined prediction score."""
+    response = client.get("/api/metrics")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "prediction_score_definition" in data
+    assert "prediction_score_pct" in data["candidate_models"]["Random Forest"]
+    score = data["candidate_models"]["Random Forest"]["prediction_score_pct"]
+    assert 0 <= score <= 100
+

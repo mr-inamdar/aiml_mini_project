@@ -327,48 +327,6 @@ body {
     font-size: 0.8rem;
 }
 
-/* Metrics Table */
-.benchmark-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 0.75rem;
-    font-size: 0.9rem;
-    text-align: left;
-}
-
-.benchmark-table th {
-    background-color: #f1f5f9;
-    padding: 0.65rem 0.85rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    border-bottom: 2px solid var(--border-color);
-}
-
-.benchmark-table td {
-    padding: 0.65rem 0.85rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.benchmark-table tr.champion-row {
-    background-color: #f0fdf4;
-    font-weight: 600;
-}
-
-.benchmark-table tr.champion-row td {
-    color: #15803d;
-}
-
-.champion-tag {
-    display: inline-block;
-    background-color: #16a34a;
-    color: #ffffff;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    margin-left: 0.35rem;
-}
-
 /* Footer */
 .app-footer {
     text-align: center;

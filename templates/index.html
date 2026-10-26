@@ -24,16 +24,6 @@
 
     <!-- Main Container -->
     <main class="container main-content">
-        <!-- Project Introduction -->
-        <section class="card intro-card">
-            <h2>About the Project</h2>
-            <p>
-                RideWise is a college machine learning mini-project that predicts hourly bike rental demand 
-                in metropolitan areas using meteorological conditions, calendar schedules, and diurnal patterns 
-                trained on the authentic UCI Bike Sharing Dataset.
-            </p>
-        </section>
-
         <!-- Prediction Form Card -->
         <section class="card prediction-card">
             <h2>Forecast Rental Demand</h2>
@@ -175,15 +165,6 @@
                     <span>Model: <strong>Random Forest Regressor</strong></span> &bull; 
                     <span>Raw Output: <code id="raw-prediction-val">0.00</code></span>
                 </div>
-            </div>
-        </section>
-
-        <!-- Benchmark Metrics Card -->
-        <section class="card metrics-card">
-            <h2>Model Performance (Held-Out Evaluation)</h2>
-            <p class="section-desc">Evaluated on the 20% held-out chronological test split (3,476 test hours) without data leakage.</p>
-            <div id="metrics-table-container">
-                <p class="text-muted">Loading model metrics from backend...</p>
             </div>
         </section>
     </main>

@@ -2,22 +2,27 @@
   "split_method": "Chronological (80% train, 20% test)",
   "train_samples": 13903,
   "test_samples": 3476,
+  "test_actual_mean": 248.75,
   "target": "cnt",
+  "prediction_score_definition": "Custom error-based score: max(0, 1 - MAE / mean(actual_test_values)) * 100. Note: Regression tasks do not measure classification accuracy; this indicates average relative precision against actual test demand.",
   "candidate_models": {
     "Linear Regression": {
       "mae": 110.3,
       "rmse": 158.5,
-      "r2": 0.4832
+      "r2": 0.4832,
+      "prediction_score_pct": 55.66
     },
     "Decision Tree": {
       "mae": 95.9,
       "rmse": 140.79,
-      "r2": 0.5923
+      "r2": 0.5923,
+      "prediction_score_pct": 61.45
     },
     "Random Forest": {
       "mae": 86.58,
       "rmse": 124.3,
-      "r2": 0.6822
+      "r2": 0.6822,
+      "prediction_score_pct": 65.19
     }
   },
   "best_model": {
@@ -26,7 +31,8 @@
     "metrics": {
       "mae": 86.58,
       "rmse": 124.3,
-      "r2": 0.6822
+      "r2": 0.6822,
+      "prediction_score_pct": 65.19
     }
   }
 }

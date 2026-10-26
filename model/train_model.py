@@ -233,11 +233,13 @@ def train_and_evaluate_models(
     pipelines: Dict[str, Pipeline] = {}
     metrics: Dict[str, Dict[str, float]] = {}
 
-    print("\n" + "=" * 70)
-    print(" " * 22 + "MODEL BENCHMARK RESULTS")
-    print("=" * 70)
-    print(f"{'Model Name':<22} | {'MAE':<10} | {'RMSE':<10} | {'R² Score':<10}")
-    print("-" * 70)
+    y_test_mean = float(y_test.mean())
+
+    print("\n" + "=" * 86)
+    print(" " * 28 + "MODEL BENCHMARK RESULTS")
+    print("=" * 86)
+    print(f"{'Model Name':<20} | {'MAE':<10} | {'RMSE':<10} | {'R² Score':<10} | {'Score (%)*':<14}")
+    print("-" * 86)
 
     for name, model in candidate_models.items():
         logger.info(f"Training {name}...")
@@ -255,23 +257,28 @@ def train_and_evaluate_models(
         mae = float(mean_absolute_error(y_test, y_pred))
         rmse = float(root_mean_squared_error(y_test, y_pred))
         r2 = float(r2_score(y_test, y_pred))
+        # Custom error-based metric: max(0, 1 - MAE / mean(actual)) * 100
+        pred_score = max(0.0, (1.0 - (mae / y_test_mean))) * 100.0
 
         pipelines[name] = pipeline
         metrics[name] = {
             "mae": round(mae, 2),
             "rmse": round(rmse, 2),
-            "r2": round(r2, 4)
+            "r2": round(r2, 4),
+            "prediction_score_pct": round(pred_score, 2)
         }
 
-        print(f"{name:<22} | {mae:<10.2f} | {rmse:<10.2f} | {r2:<10.4f}")
+        print(f"{name:<20} | {mae:<10.2f} | {rmse:<10.2f} | {r2:<10.4f} | {pred_score:<13.2f}%")
 
-    print("=" * 70)
+    print("=" * 86)
+    print("*Note: Score (%) = max(0, 1 - MAE / mean(actual test values)) * 100 (Custom error-based score).")
+    print("=" * 86)
 
     # Model selection based on highest R2 score and lowest RMSE
     best_model_name = max(metrics, key=lambda k: (metrics[k]["r2"], -metrics[k]["rmse"]))
     logger.info(
         f"Selected Best Model: '{best_model_name}' "
-        f"(R² = {metrics[best_model_name]['r2']}, RMSE = {metrics[best_model_name]['rmse']}, MAE = {metrics[best_model_name]['mae']})"
+        f"(R² = {metrics[best_model_name]['r2']}, RMSE = {metrics[best_model_name]['rmse']}, MAE = {metrics[best_model_name]['mae']}, Score = {metrics[best_model_name]['prediction_score_pct']}%)"
     )
 
     return pipelines, metrics, best_model_name
@@ -322,6 +329,7 @@ def save_artifacts(
     feature_importance: Dict[str, Any],
     train_count: int,
     test_count: int,
+    test_actual_mean: float,
     output_dir: str
 ):
     """Save all model artifacts and metadata to output_dir."""
@@ -338,7 +346,12 @@ def save_artifacts(
         "split_method": "Chronological (80% train, 20% test)",
         "train_samples": train_count,
         "test_samples": test_count,
+        "test_actual_mean": round(test_actual_mean, 2),
         "target": TARGET_COLUMN,
+        "prediction_score_definition": (
+            "Custom error-based score: max(0, 1 - MAE / mean(actual_test_values)) * 100. "
+            "Note: Regression tasks do not measure classification accuracy; this indicates average relative precision against actual test demand."
+        ),
         "candidate_models": metrics,
         "best_model": {
             "name": best_model_name,
@@ -401,6 +414,7 @@ def run_pipeline(data_path: str = "dataset/hour.csv", output_dir: str = "model")
         feature_importance=feature_importance,
         train_count=len(train_df),
         test_count=len(test_df),
+        test_actual_mean=float(y_test.mean()),
         output_dir=output_dir
     )
 

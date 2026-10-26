@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultBox = document.getElementById("prediction-result");
     const predictionCount = document.getElementById("prediction-count");
     const rawPredictionVal = document.getElementById("raw-prediction-val");
-    const metricsContainer = document.getElementById("metrics-table-container");
 
     // =========================================================================
     // 1. Check Backend & Model Health Status
@@ -40,59 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(() => {
             statusBadge.textContent = "▲ Backend Disconnected";
             statusBadge.className = "badge badge-error";
-        });
-
-    // =========================================================================
-    // 2. Fetch and Render Model Benchmark Metrics
-    // =========================================================================
-    fetch("/api/metrics")
-        .then((res) => {
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.json();
-        })
-        .then((data) => {
-            if (data && data.candidate_models) {
-                const championName = data.best_model ? data.best_model.name : "Random Forest";
-                let html = `
-                    <table class="benchmark-table">
-                        <thead>
-                            <tr>
-                                <th>Algorithm</th>
-                                <th>Mean Absolute Error (MAE)</th>
-                                <th>Root Mean Squared Error (RMSE)</th>
-                                <th>R² Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                for (const [modelName, m] of Object.entries(data.candidate_models)) {
-                    const isChampion = modelName === championName;
-                    html += `
-                        <tr class="${isChampion ? 'champion-row' : ''}">
-                            <td>
-                                <strong>${modelName}</strong>
-                                ${isChampion ? '<span class="champion-tag">⭐ Selected Model</span>' : ''}
-                            </td>
-                            <td>${Number(m.mae).toFixed(2)}</td>
-                            <td>${Number(m.rmse).toFixed(2)}</td>
-                            <td>${Number(m.r2).toFixed(4)}</td>
-                        </tr>
-                    `;
-                }
-
-                html += `
-                        </tbody>
-                    </table>
-                `;
-                metricsContainer.innerHTML = html;
-            } else {
-                metricsContainer.innerHTML = '<p class="text-muted">Metrics data is currently unavailable.</p>';
-            }
-        })
-        .catch((err) => {
-            console.warn("Could not load model metrics:", err);
-            metricsContainer.innerHTML = '<p class="text-muted">Could not load benchmark metrics.</p>';
         });
 
     // =========================================================================
