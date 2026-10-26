@@ -1,107 +1,124 @@
 {
   "supported": true,
+  "model_type": "Linear Regression",
+  "intercept": 67.49057,
   "top_features": [
     {
       "feature": "temp",
-      "importance": 0.19742
-    },
-    {
-      "feature": "hum",
-      "importance": 0.15852
+      "coefficient": 290.55087,
+      "relative_weight": 0.10271
     },
     {
       "feature": "hr_17",
-      "importance": 0.08997
-    },
-    {
-      "feature": "workingday",
-      "importance": 0.08851
+      "coefficient": 226.64386,
+      "relative_weight": 0.08012
     },
     {
       "feature": "hr_18",
-      "importance": 0.07971
+      "coefficient": 201.81176,
+      "relative_weight": 0.07134
     },
     {
       "feature": "hr_8",
-      "importance": 0.06638
-    },
-    {
-      "feature": "hr_19",
-      "importance": 0.03469
-    },
-    {
-      "feature": "windspeed",
-      "importance": 0.02159
-    },
-    {
-      "feature": "hr_7",
-      "importance": 0.01799
-    },
-    {
-      "feature": "hr_1",
-      "importance": 0.01619
-    },
-    {
-      "feature": "hr_2",
-      "importance": 0.01605
-    },
-    {
-      "feature": "hr_3",
-      "importance": 0.01514
+      "coefficient": 173.13861,
+      "relative_weight": 0.0612
     },
     {
       "feature": "hr_4",
-      "importance": 0.01451
+      "coefficient": -145.23158,
+      "relative_weight": 0.05134
     },
     {
-      "feature": "hr_16",
-      "importance": 0.01433
+      "feature": "hr_3",
+      "coefficient": -143.59032,
+      "relative_weight": 0.05076
+    },
+    {
+      "feature": "hr_2",
+      "coefficient": -134.37838,
+      "relative_weight": 0.0475
+    },
+    {
+      "feature": "hr_5",
+      "coefficient": -130.36046,
+      "relative_weight": 0.04608
+    },
+    {
+      "feature": "hr_1",
+      "coefficient": -127.72459,
+      "relative_weight": 0.04515
     },
     {
       "feature": "hr_0",
-      "importance": 0.01406
+      "coefficient": -111.8735,
+      "relative_weight": 0.03955
+    },
+    {
+      "feature": "hr_19",
+      "coefficient": 104.91397,
+      "relative_weight": 0.03709
+    },
+    {
+      "feature": "hum",
+      "coefficient": -85.48775,
+      "relative_weight": 0.03022
+    },
+    {
+      "feature": "hr_23",
+      "coefficient": -82.61408,
+      "relative_weight": 0.0292
+    },
+    {
+      "feature": "hr_16",
+      "coefficient": 81.19887,
+      "relative_weight": 0.0287
+    },
+    {
+      "feature": "hr_6",
+      "coefficient": -76.50806,
+      "relative_weight": 0.02705
     }
   ],
   "aggregated_by_original_column": [
     {
       "feature": "hr",
-      "importance": 0.46175
+      "importance": 0.7239
     },
     {
       "feature": "temp",
-      "importance": 0.19742
-    },
-    {
-      "feature": "hum",
-      "importance": 0.15852
-    },
-    {
-      "feature": "workingday",
-      "importance": 0.08851
+      "importance": 0.10271
     },
     {
       "feature": "mnth",
-      "importance": 0.02341
-    },
-    {
-      "feature": "windspeed",
-      "importance": 0.02159
-    },
-    {
-      "feature": "weekday",
-      "importance": 0.01939
+      "importance": 0.05951
     },
     {
       "feature": "weathersit",
-      "importance": 0.01535
+      "importance": 0.03022
+    },
+    {
+      "feature": "hum",
+      "importance": 0.03022
     },
     {
       "feature": "season",
-      "importance": 0.01249
+      "importance": 0.02028
+    },
+    {
+      "feature": "windspeed",
+      "importance": 0.01791
+    },
+    {
+      "feature": "weekday",
+      "importance": 0.00818
     },
     {
       "feature": "holiday",
-      "importance": 0.00158
+      "importance": 0.00481
+    },
+    {
+      "feature": "workingday",
+      "importance": 0.00226
     }
   ]
 }

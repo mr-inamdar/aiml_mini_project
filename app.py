@@ -234,10 +234,13 @@ def health_check():
     """Check system operational status and model readiness."""
     model_loaded = False
     model_error = None
+    model_type = None
 
     try:
         pipeline, _ = load_artifacts()
         model_loaded = pipeline is not None
+        if model_loaded and "regressor" in pipeline.named_steps:
+            model_type = pipeline.named_steps["regressor"].__class__.__name__
     except Exception as e:
         model_error = str(e)
         logger.warning("Health check detected model issue: %s", e)
@@ -248,6 +251,8 @@ def health_check():
     response = {
         "status": status_str,
         "model_loaded": model_loaded,
+        "model_type": model_type,
+        "model_name": "Linear Regression" if model_loaded else None,
         "dataset_available": dataset_exists,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }

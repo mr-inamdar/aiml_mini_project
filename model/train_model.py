@@ -1,14 +1,13 @@
 """RideWise — Model Training & Evaluation Pipeline
 ==================================================
-This module trains and compares multiple regression algorithms
-(Linear Regression, Decision Tree, Random Forest) on the UCI Bike Sharing
+This module trains and evaluates the Linear Regression model on the UCI Bike Sharing
 dataset using a chronological train/test split.
 
 Outputs saved to model/:
-- bike_model.joblib          : Serialized scikit-learn Pipeline of the best model
-- metrics.json               : Held-out evaluation metrics (MAE, RMSE, R2) for all models
+- bike_model.joblib          : Serialized scikit-learn Pipeline of the trained Linear Regression model
+- metrics.json               : Held-out evaluation metrics (MAE, RMSE, R2) for Linear Regression
 - feature_schema.json        : Exact input features, encodings, and ranges
-- feature_importance.json    : Feature importances of the best tree-based model
+- feature_importance.json    : Feature coefficients and relative weights from Linear Regression
 """
 
 import argparse
@@ -22,12 +21,10 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.tree import DecisionTreeRegressor
 
 # Setup logging
 logging.basicConfig(
@@ -210,24 +207,16 @@ def train_and_evaluate_models(
     y_test: pd.Series,
     preprocessor: ColumnTransformer
 ) -> Tuple[Dict[str, Pipeline], Dict[str, Dict[str, float]], str]:
-    """Train Linear Regression, Decision Tree, and Random Forest pipelines.
+    """Train Linear Regression pipeline and evaluate on chronological test split.
     
-    Evaluates each on the test set using MAE, RMSE, and R2.
+    Evaluates on the test set using MAE, RMSE, and R2.
     Returns:
         pipelines: Dict of trained pipelines
         metrics: Dict of performance metrics per model
-        best_model_name: The name of the selected best model
+        best_model_name: The name of the selected model ("Linear Regression")
     """
     candidate_models = {
-        "Linear Regression": LinearRegression(),
-        "Decision Tree": DecisionTreeRegressor(random_state=42, max_depth=15, min_samples_split=5),
-        "Random Forest": RandomForestRegressor(
-            n_estimators=100,
-            random_state=42,
-            max_depth=20,
-            min_samples_split=4,
-            n_jobs=-1
-        )
+        "Linear Regression": LinearRegression()
     }
 
     pipelines: Dict[str, Pipeline] = {}
@@ -274,10 +263,9 @@ def train_and_evaluate_models(
     print("*Note: Score (%) = max(0, 1 - MAE / mean(actual test values)) * 100 (Custom error-based score).")
     print("=" * 86)
 
-    # Model selection based on highest R2 score and lowest RMSE
-    best_model_name = max(metrics, key=lambda k: (metrics[k]["r2"], -metrics[k]["rmse"]))
+    best_model_name = "Linear Regression"
     logger.info(
-        f"Selected Best Model: '{best_model_name}' "
+        f"Selected Model: '{best_model_name}' "
         f"(R² = {metrics[best_model_name]['r2']}, RMSE = {metrics[best_model_name]['rmse']}, MAE = {metrics[best_model_name]['mae']}, Score = {metrics[best_model_name]['prediction_score_pct']}%)"
     )
 
@@ -285,41 +273,49 @@ def train_and_evaluate_models(
 
 
 def extract_feature_importance(pipeline: Pipeline) -> Dict[str, Any]:
-    """Extract feature importance from tree-based regressor."""
+    """Extract feature coefficients and relative weights from Linear Regression."""
     regressor = pipeline.named_steps["regressor"]
     preprocessor = pipeline.named_steps["preprocessor"]
 
-    if not hasattr(regressor, "feature_importances_"):
-        return {"supported": False}
+    if hasattr(regressor, "coef_"):
+        all_names = get_feature_names(preprocessor)
+        coefs = regressor.coef_
+        abs_coefs = np.abs(coefs)
+        total_abs = np.sum(abs_coefs)
+        relative_weights = (abs_coefs / total_abs) if total_abs > 0 else abs_coefs
 
-    all_names = get_feature_names(preprocessor)
-    raw_importances = regressor.feature_importances_
+        feature_coef_list = [
+            {
+                "feature": name,
+                "coefficient": round(float(c), 5),
+                "relative_weight": round(float(w), 5)
+            }
+            for name, c, w in sorted(zip(all_names, coefs, relative_weights), key=lambda x: abs(x[1]), reverse=True)
+        ]
 
-    # Individual one-hot importances
-    feature_importance_list = [
-        {"feature": name, "importance": round(float(imp), 5)}
-        for name, imp in sorted(zip(all_names, raw_importances), key=lambda x: x[1], reverse=True)
-    ]
+        # Aggregated absolute influence by original column
+        aggregated: Dict[str, float] = {col: 0.0 for col in FEATURE_COLUMNS}
+        for item in feature_coef_list:
+            feat_name = item["feature"]
+            for orig_col in FEATURE_COLUMNS:
+                if feat_name == orig_col or feat_name.startswith(f"{orig_col}_"):
+                    aggregated[orig_col] += item["relative_weight"]
+                    break
 
-    # Aggregated importance by original feature column
-    aggregated: Dict[str, float] = {col: 0.0 for col in FEATURE_COLUMNS}
-    for item in feature_importance_list:
-        feat_name = item["feature"]
-        for orig_col in FEATURE_COLUMNS:
-            if feat_name == orig_col or feat_name.startswith(f"{orig_col}_"):
-                aggregated[orig_col] += item["importance"]
-                break
+        aggregated_sorted = [
+            {"feature": col, "importance": round(imp, 5)}
+            for col, imp in sorted(aggregated.items(), key=lambda x: x[1], reverse=True)
+        ]
 
-    aggregated_sorted = [
-        {"feature": col, "importance": round(imp, 5)}
-        for col, imp in sorted(aggregated.items(), key=lambda x: x[1], reverse=True)
-    ]
+        return {
+            "supported": True,
+            "model_type": "Linear Regression",
+            "intercept": round(float(regressor.intercept_), 5),
+            "top_features": feature_coef_list[:15],
+            "aggregated_by_original_column": aggregated_sorted
+        }
 
-    return {
-        "supported": True,
-        "top_features": feature_importance_list[:15],
-        "aggregated_by_original_column": aggregated_sorted
-    }
+    return {"supported": False}
 
 
 def save_artifacts(
@@ -355,7 +351,7 @@ def save_artifacts(
         "candidate_models": metrics,
         "best_model": {
             "name": best_model_name,
-            "selection_criteria": "Highest R-squared and lowest RMSE on held-out test split",
+            "selection_criteria": "Trained Linear Regression evaluated on held-out chronological test split",
             "metrics": metrics[best_model_name]
         }
     }

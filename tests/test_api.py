@@ -44,6 +44,8 @@ def test_health_check_endpoint(client):
     assert data["status"] == "healthy"
     assert data["model_loaded"] is True
     assert data["dataset_available"] is True
+    assert data["model_type"] == "LinearRegression"
+    assert data["model_name"] == "Linear Regression"
 
 
 def test_metrics_endpoint(client):
@@ -53,8 +55,8 @@ def test_metrics_endpoint(client):
     data = response.get_json()
     assert "candidate_models" in data
     assert "best_model" in data
-    assert "Random Forest" in data["candidate_models"]
-    assert data["best_model"]["name"] == "Random Forest"
+    assert "Linear Regression" in data["candidate_models"]
+    assert data["best_model"]["name"] == "Linear Regression"
 
 
 def test_analytics_endpoint(client):
@@ -175,7 +177,7 @@ def test_metrics_includes_prediction_score(client):
     assert response.status_code == 200
     data = response.get_json()
     assert "prediction_score_definition" in data
-    assert "prediction_score_pct" in data["candidate_models"]["Random Forest"]
-    score = data["candidate_models"]["Random Forest"]["prediction_score_pct"]
+    assert "prediction_score_pct" in data["candidate_models"]["Linear Regression"]
+    score = data["candidate_models"]["Linear Regression"]["prediction_score_pct"]
     assert 0 <= score <= 100
 

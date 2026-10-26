@@ -48,6 +48,14 @@ def load_artifacts():
     return _PIPELINE, _SCHEMA
 
 
+def reload_artifacts():
+    """Force reload of artifacts from disk."""
+    global _PIPELINE, _SCHEMA
+    _PIPELINE = None
+    _SCHEMA = None
+    return load_artifacts()
+
+
 def predict_demand(input_data: Union[Dict[str, Any], List[Dict[str, Any]], pd.DataFrame]) -> Dict[str, Any]:
     """Generate bike rental predictions for provided input features.
     

@@ -11,28 +11,16 @@
       "rmse": 158.5,
       "r2": 0.4832,
       "prediction_score_pct": 55.66
-    },
-    "Decision Tree": {
-      "mae": 95.9,
-      "rmse": 140.79,
-      "r2": 0.5923,
-      "prediction_score_pct": 61.45
-    },
-    "Random Forest": {
-      "mae": 86.58,
-      "rmse": 124.3,
-      "r2": 0.6822,
-      "prediction_score_pct": 65.19
     }
   },
   "best_model": {
-    "name": "Random Forest",
-    "selection_criteria": "Highest R-squared and lowest RMSE on held-out test split",
+    "name": "Linear Regression",
+    "selection_criteria": "Trained Linear Regression evaluated on held-out chronological test split",
     "metrics": {
-      "mae": 86.58,
-      "rmse": 124.3,
-      "r2": 0.6822,
-      "prediction_score_pct": 65.19
+      "mae": 110.3,
+      "rmse": 158.5,
+      "r2": 0.4832,
+      "prediction_score_pct": 55.66
     }
   }
 }

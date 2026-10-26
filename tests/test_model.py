@@ -21,33 +21,34 @@ def test_model_artifacts_exist():
 
 
 def test_model_pipeline_loads_properly():
-    """Verify that the model pipeline can be loaded and has expected components."""
+    """Verify that the model pipeline can be loaded and uses LinearRegression."""
+    from sklearn.linear_model import LinearRegression
     pipeline, schema = load_artifacts()
     assert isinstance(pipeline, Pipeline), "Loaded model is not a scikit-learn Pipeline"
     assert "preprocessor" in pipeline.named_steps
     assert "regressor" in pipeline.named_steps
+    assert isinstance(pipeline.named_steps["regressor"], LinearRegression), "Regressor is not LinearRegression"
 
 
 def test_metrics_json_structure_and_values():
-    """Verify that metrics.json contains evaluations for all 3 candidate models."""
+    """Verify that metrics.json contains evaluation for Linear Regression."""
     with open(METRICS_PATH, "r", encoding="utf-8") as f:
         metrics_data = json.load(f)
 
     assert "candidate_models" in metrics_data
     candidates = metrics_data["candidate_models"]
 
-    for model_name in ["Linear Regression", "Decision Tree", "Random Forest"]:
-        assert model_name in candidates, f"{model_name} missing from metrics"
-        assert "mae" in candidates[model_name]
-        assert "rmse" in candidates[model_name]
-        assert "r2" in candidates[model_name]
-        assert "prediction_score_pct" in candidates[model_name]
-        assert candidates[model_name]["r2"] > 0, f"R2 score should be positive for {model_name}"
-        assert 0 <= candidates[model_name]["prediction_score_pct"] <= 100
+    assert "Linear Regression" in candidates, "Linear Regression missing from metrics"
+    lr_metrics = candidates["Linear Regression"]
+    assert "mae" in lr_metrics
+    assert "rmse" in lr_metrics
+    assert "r2" in lr_metrics
+    assert "prediction_score_pct" in lr_metrics
+    assert lr_metrics["r2"] > 0, "R2 score should be positive for Linear Regression"
+    assert 0 <= lr_metrics["prediction_score_pct"] <= 100
 
     best_model = metrics_data["best_model"]
-    assert best_model["name"] == "Random Forest"
-    assert candidates["Random Forest"]["r2"] > candidates["Linear Regression"]["r2"]
+    assert best_model["name"] == "Linear Regression"
 
 
 def test_feature_schema_columns():
